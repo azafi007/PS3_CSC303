@@ -1,0 +1,44 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DBMS Project Portal</title>
+<style>
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin:0; padding:0; background-color:#f4f6f8; }
+    header { background-color:#0d6efd; color:white; padding:20px; text-align:center; }
+    header h1 { margin:0; }
+    .container { max-width:1200px; margin:40px auto; padding:0 20px; }
+    .roles-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(250px, 1fr)); gap:20px; }
+    .role-card { background:white; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.1); padding:20px; text-align:center; transition: transform 0.2s, box-shadow 0.2s; }
+    .role-card:hover { transform:translateY(-5px); box-shadow:0 8px 20px rgba(0,0,0,0.15); }
+    .role-card a { display:block; text-decoration:none; color:#0d6efd; font-weight:bold; font-size:18px; margin-top:10px; }
+    .role-card a:hover { text-decoration:underline; }
+    footer { text-align:center; padding:20px; background:#0d6efd; color:white; margin-top:40px; }
+</style>
+</head>
+<body>
+
+<header>
+    <h1>DBMS Project Portal</h1>
+    <p>An interactive portal for your team project roles and features</p>
+</header>
+
+<div class="container">
+    <div class="roles-grid">
+        <div class="role-card"><h3>Manager</h3><a href="manager/company_stock_management.html">Go to Features</a></div>
+        <div class="role-card"><h3>Investor</h3><a href="investor/company_stock_management.html">Go to Features</a></div>
+        <div class="role-card"><h3>Trader</h3><a href="trader/company_stock_management.html">Go to Features</a></div>
+        <div class="role-card"><h3>Audit Team</h3><a href="audit_team/company_stock_management.html">Go to Features</a></div>
+        <div class="role-card"><h3>Company</h3><a href="company/company_stock_management.html">Go to Features</a></div>
+        <div class="role-card"><h3>Customer</h3><a href="customer/company_stock_management.html">Go to Features</a></div>
+        <div class="role-card"><h3>Analyst</h3><a href="analyst/company_stock_management.html">Go to Features</a></div>
+        <div class="role-card"><h3>IT Department</h3><a href="it_department/it_dashboard.html">Go to Features</a></div>
+        <div class="role-card"><h3>Regulator</h3><a href="regulator/regulator_dashboard.html">Go to Features</a></div>
+    </div>
+</div>
+
+<footer>&copy; 2025 DBMS Project Team</footer>
+</body>
+</html>
