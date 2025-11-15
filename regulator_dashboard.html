@@ -1,10 +1,41 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<title>Regulator - regulator dashboard</title>
+<meta charset="UTF-8">
+<title>Regulator Dashboard</title>
+<style>
+body { background:#0d1b2a; color:white; font-family:Arial; margin:0; }
+header { background:#1b263b; padding:20px; font-size:26px; font-weight:bold; text-align:center; }
+.container { padding:40px; }
+a.button {
+    display:block;
+    background:#415a77;
+    margin:12px 0;
+    padding:18px;
+    color:white;
+    text-decoration:none;
+    border-radius:10px;
+    font-size:20px;
+    transition:0.3s;
+}
+a.button:hover { background:#778da9; transform:scale(1.03); }
+</style>
 </head>
+
 <body>
-<h2>Regulator Page</h2>
-<p>This page contains Regulator content.</p>
+
+<header>Regulator Dashboard</header>
+
+<div class="container">
+
+    <a href="regulator_company_info.html" class="button">Company Info Review</a>
+    <a href="regulator_financial_reports.html" class="button">Financial Reports</a>
+    <a href="regulator_audit_view.html" class="button">Audit Report View</a>
+    <a href="regulator_fraud_view.html" class="button">AI-Based Fraud Detection</a>
+    <a href="regulator_trade_overview.html" class="button">Trade Overview</a>
+    <a href="regulation_compliance_page.html" class="button">Regulation Compliance</a>
+
+</div>
+
 </body>
 </html>
