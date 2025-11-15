@@ -1,10 +1,39 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<title>IT Department - it dashboard</title>
+<meta charset="UTF-8">
+<title>IT Department Dashboard</title>
+<style>
+body { background:#0d1b2a; color:white; font-family:Arial; margin:0; }
+header { background:#1b263b; padding:20px; font-size:26px; font-weight:bold; text-align:center; }
+.container { padding:40px; }
+a.button {
+    display:block;
+    background:#415a77;
+    margin:12px 0;
+    padding:18px;
+    color:white;
+    text-decoration:none;
+    border-radius:10px;
+    font-size:20px;
+    transition:0.3s;
+}
+a.button:hover { background:#778da9; transform:scale(1.03); }
+</style>
 </head>
+
 <body>
-<h2>IT Department Page</h2>
-<p>This page contains IT Department content.</p>
+
+<header>IT Department Dashboard</header>
+
+<div class="container">
+    <a href="verify_user_identity.html" class="button">Verify User Identity</a>
+    <a href="security_checks.html" class="button">Security Checks</a>
+    <a href="cybersecurity_alerts.html" class="button">Cybersecurity Alerts</a>
+    <a href="system_logs.html" class="button">System Logs</a>
+    <a href="data_integrity_monitor.html" class="button">Data Integrity Monitor</a>
+    <a href="access_control_support.html" class="button">Access Control Support</a>
+</div>
+
 </body>
 </html>
