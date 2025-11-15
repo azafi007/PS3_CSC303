@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Audit Team Dashboard</title>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f5f7fa;
+        }
+
+        /* NAVBAR */
+        .navbar {
+            background: #2b3e50;
+            padding: 15px;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: white;
+            margin-left: 20px;
+            text-decoration: none;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .nav-links a:hover {
+            text-decoration: underline;
+        }
+
+        /* MAIN LAYOUT */
+        .container {
+            padding: 20px;
+        }
+
+        .section {
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        /* CARDS */
+        .card {
+            background: white;
+            padding: 20px;
+            margin-top: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        }
+
+        .card h4 {
+            margin-top: 0;
+        }
+
+        /* TABLE */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th {
+            background: #ededed;
+            padding: 10px;
+        }
+        td {
+            padding: 10px;
+        }
+
+        /* BUTTONS */
+        .btn {
+            margin-top: 15px;
+            padding: 10px 20px;
+            background: #2b3e50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .btn:hover {
+            background: #1e2c3a;
+        }
+
+        select, input, textarea {
+            width: 100%;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 10px;
+            border: 1px solid #ccc;
+        }
+
+        textarea {
+            height: 150px;
+            resize: none;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- NAVBAR -->
+    <nav class="navbar">
+        <h2>Audit Team Dashboard</h2>
+        <div class="nav-links">
+            <a onclick="showSection('balances')">Balance Info</a>
+            <a onclick="showSection('transactions')">Transactions</a>
+            <a onclick="showSection('auditreport')">Create Report</a>
+            <a onclick="showSection('viewreports')">View Reports</a>
+        </div>
+    </nav>
+
+    <!-- MAIN CONTAINER -->
+    <div class="container">
+
+        <!-- SECTION 1: Balance Information -->
+        <section id="balances" class="section active">
+            <h3>Received Balance Information</h3>
+
+            <div class="card">
+                <h4>Company / Investor Balances</h4>
+
+                <table>
+                    <tr>
+                        <th>Account</th>
+                        <th>Type</th>
+                        <th>Balance</th>
+                    </tr>
+                    <tr>
+                        <td>Investor A</td>
+                        <td>Investor</td>
+                        <td>$15,200</td>
+                    </tr>
+                    <tr>
+                        <td>Company X</td>
+                        <td>Company</td>
+                        <td>$1,200,000</td>
+                    </tr>
+                </table>
+            </div>
+        </section>
+
+        <!-- SECTION 2: Transaction Confirmation -->
+        <section id="transactions" class="section">
+            <h3>Received Transaction Confirmations</h3>
+
+            <div class="card">
+                <h4>Recent Transactions</h4>
+
+                <table>
+                    <tr>
+                        <th>Date</th>
+                        <th>Account</th>
+                        <th>Action</th>
+                        <th>Amount</th>
+                    </tr>
+                    <tr>
+                        <td>2025-11-15</td>
+                        <td>Investor A</td>
+                        <td>Buy</td>
+                        <td>120 shares</td>
+                    </tr>
+                    <tr>
+                        <td>2025-11-14</td>
+                        <td>Company X</td>
+                        <td>Sell</td>
+                        <td>450 shares</td>
+                    </tr>
+                </table>
+            </div>
+        </section>
+
+        <!-- SECTION 3: Create Audit Report -->
+        <section id="auditreport" class="section">
+            <h3>Create Audit Report</h3>
+
+            <div class="card">
+                <h4>Audit Details</h4>
+
+                <label>Select Account</label>
+                <select>
+                    <option>Investor A</option>
+                    <option>Investor B</option>
+                    <option>Company X</option>
+                    <option>Company Y</option>
+                </select>
+
+                <label>Write Audit Report</label>
+                <textarea placeholder="Enter audit findings here..."></textarea>
+
+                <button class="btn">Save Report</button>
+            </div>
+        </section>
+
+        <!-- SECTION 4: View Stored Reports -->
+        <section id="viewreports" class="section">
+            <h3>Stored Audit Reports</h3>
+
+            <div class="card">
+                <table>
+                    <tr>
+                        <th>Date</th>
+                        <th>Account</th>
+                        <th>Summary</th>
+                        <th>Action</th>
+                    </tr>
+
+                    <tr>
+                        <td>2025-11-15</td>
+                        <td>Investor A</td>
+                        <td>All transactions verified. No issues.</td>
+                        <td><button class="btn">Send to Regulator</button></td>
+                    </tr>
+
+                    <tr>
+                        <td>2025-11-10</td>
+                        <td>Company X</td>
+                        <td>Minor discrepancies found. Needs review.</td>
+                        <td><button class="btn">Send to Manager</button></td>
+                    </tr>
+                </table>
+            </div>
+        </section>
+
+    </div>
+
+    <script>
+        function showSection(sectionId) {
+            const sections = document.querySelectorAll('.section');
+            sections.forEach(sec => sec.classList.remove('active'));
+
+            document.getElementById(sectionId).classList.add('active');
+        }
+    </script>
+
+</body>
+</html>

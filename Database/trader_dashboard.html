@@ -1,0 +1,656 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Trader Dashboard - Prototype</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <style>
+    :root{
+      --bg:#f4f7fb; --card:#ffffff; --muted:#6b7280; --accent:#1565c0;
+      --safe:#0f9d58; --warn:#f59e0b; --danger:#ef4444;
+      --glass: rgba(255,255,255,0.6);
+      font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;background:linear-gradient(180deg,#eef3fb, #f4f7fb);color:#111}
+    .app{display:flex;min-height:100vh}
+    /* Sidebar */
+    .sidebar{
+      width:260px;background:var(--card);border-right:1px solid #e6edf6;
+      padding:18px;display:flex;flex-direction:column;gap:18px;
+    }
+    .brand{display:flex;gap:12px;align-items:center}
+    .logo{width:44px;height:44px;border-radius:8px;background:linear-gradient(135deg,var(--accent),#42a5f5);display:flex;align-items:center;justify-content:center;color:white;font-weight:700}
+    .nav button{display:block;width:100%;text-align:left;padding:10px;border-radius:8px;border:none;background:transparent;cursor:pointer;color:#123; font-weight:600}
+    .nav button.active{background:#eef6ff}
+    .sidebar .small{font-size:12px;color:var(--muted)}
+    /* Main area */
+    .main{flex:1;padding:20px 28px;display:flex;flex-direction:column;gap:18px}
+    .topbar{display:flex;justify-content:space-between;align-items:center}
+    .searchbar{display:flex;gap:8px;align-items:center}
+    input, select, textarea{padding:8px 10px;border-radius:6px;border:1px solid #dde7f3;background:white}
+    .card-row{display:flex;gap:14px}
+    .card{flex:1;background:var(--card);padding:14px;border-radius:10px;box-shadow:0 2px 6px rgba(12,28,56,0.04)}
+    .card h3{margin:0;font-size:14px;color:var(--muted)}
+    .card .num{font-size:22px;font-weight:700;margin-top:8px}
+    /* two-column layout */
+    .grid{display:grid;grid-template-columns:1fr 420px;gap:14px}
+    /* stocks table */
+    table{width:100%;border-collapse:collapse}
+    th, td{padding:8px 10px;border-bottom:1px solid #eef3fb;text-align:left;font-size:14px}
+    th{font-size:13px;color:var(--muted)}
+    .trade-btn{background:var(--accent);color:white;padding:6px 8px;border-radius:6px;border:none;cursor:pointer}
+    /* panels */
+    .panel{background:var(--card);padding:12px;border-radius:8px;min-height:120px}
+    .muted{color:var(--muted);font-size:13px}
+    /* modal */
+    .modal-backdrop{position:fixed;inset:0;background:rgba(7,15,30,0.35);display:none;align-items:center;justify-content:center;z-index:1000}
+    .modal{width:760px;max-width:95%;background:var(--card);padding:18px;border-radius:10px;box-shadow:0 8px 30px rgba(16,40,80,0.15)}
+    .row{display:flex;gap:8px}
+    .col{flex:1}
+    .btn{padding:8px 12px;border-radius:8px;border:none;cursor:pointer}
+    .btn.primary{background:var(--accent);color:white}
+    .btn.ghost{background:transparent;border:1px solid #d6e6fb}
+    /* login */
+    .login-wrap{display:flex;height:100vh;align-items:center;justify-content:center}
+    .login-box{width:420px;background:var(--card);padding:28px;border-radius:12px;box-shadow:0 14px 40px rgba(8,20,40,0.08)}
+    .logo-big{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+    .small-muted{color:var(--muted);font-size:13px}
+    .tag{display:inline-block;background:#eef6ff;color:var(--accent);padding:4px 8px;border-radius:8px;font-weight:600}
+    .status-dot{display:inline-block;width:10px;height:10px;border-radius:50%;vertical-align:middle;margin-right:6px}
+    .table-scroll{overflow:auto;max-height:360px}
+    footer{font-size:13px;color:var(--muted);padding:10px 0}
+    @media(max-width:980px){.grid{grid-template-columns:1fr} .sidebar{display:none}}
+  </style>
+</head>
+<body>
+
+<div id="root">
+  <!-- LOGIN -->
+  <div id="login" class="login-wrap" aria-hidden="false">
+    <div class="login-box">
+      <div class="logo-big">
+        <div class="logo">TS</div>
+        <div>
+          <div style="font-weight:700;font-size:18px">Trader System</div>
+          <div class="small-muted">Secure trading & monitoring console</div>
+        </div>
+      </div>
+
+      <div style="margin-top:14px">
+        <label class="small-muted">Email</label>
+        <input id="email" placeholder="trader@example.com" />
+      </div>
+      <div style="margin-top:10px">
+        <label class="small-muted">Password</label>
+        <input id="pwd" type="password" placeholder="••••••••" />
+      </div>
+
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:14px">
+        <div><button id="demoLogin" class="btn ghost">Demo login</button></div>
+        <div><button id="loginBtn" class="btn primary">Login</button></div>
+      </div>
+
+      <div style="margin-top:16px" class="small-muted">Use Demo login to explore the interface.</div>
+    </div>
+  </div>
+
+  <!-- APP -->
+  <div id="app" class="app" style="display:none;">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="logo">TS</div>
+        <div>
+          <div style="font-weight:700">Trader System</div>
+          <div class="small-muted">Trader Dashboard</div>
+        </div>
+      </div>
+
+      <div class="nav">
+        <button class="active" data-view="dashboard">Dashboard</button>
+        <button data-view="stocks">Stocks</button>
+        <button data-view="predictions">Predictions</button>
+        <button data-view="trades">My Trades</button>
+        <button data-view="alerts">Fraud Alerts</button>
+        <button data-view="profile">Profile</button>
+      </div>
+
+      <div style="margin-top:auto">
+        <div class="small-muted">Logged in as</div>
+        <div style="margin-top:8px;font-weight:700" id="usernameDisplay">Demo Trader</div>
+        <div style="margin-top:10px">
+          <button id="logoutBtn" class="btn ghost">Logout</button>
+        </div>
+      </div>
+    </aside>
+
+    <main class="main">
+      <div class="topbar">
+        <div style="display:flex;gap:12px;align-items:center">
+          <div style="font-weight:700;font-size:18px" id="pageTitle">Dashboard</div>
+          <div class="muted" id="subTitle">Overview & Quick Actions</div>
+        </div>
+
+        <div style="display:flex;gap:10px;align-items:center">
+          <input id="globalSearch" placeholder="Search stocks, trades or alerts" />
+          <button id="placeTradeQuick" class="btn primary">Place New Trade</button>
+        </div>
+      </div>
+
+      <!-- Dashboard view -->
+      <div id="view-dashboard" class="view">
+        <div class="card-row">
+          <div class="card">
+            <h3>Total Trades Today</h3>
+            <div class="num" id="totalTrades">—</div>
+            <div class="muted">Trades executed by you today</div>
+          </div>
+
+          <div class="card">
+            <h3>Pending Orders</h3>
+            <div class="num" id="pendingOrders">—</div>
+            <div class="muted">Orders awaiting completion</div>
+          </div>
+
+          <div class="card">
+            <h3>Portfolio Value</h3>
+            <div class="num" id="portfolioValue">$—</div>
+            <div class="muted">Market value of holdings</div>
+          </div>
+
+          <div class="card">
+            <h3>Fraud Alerts</h3>
+            <div class="num" id="openAlerts">—</div>
+            <div class="muted">Alerts assigned to you</div>
+          </div>
+        </div>
+
+        <div style="height:14px"></div>
+
+        <div class="grid">
+          <div>
+            <div class="panel">
+              <div style="display:flex;justify-content:space-between;align-items:center">
+                <div><strong>Recent Activity</strong><div class="muted">Latest trades & system events</div></div>
+                <div><button id="viewAllTrades" class="btn ghost">View All</button></div>
+              </div>
+              <div style="height:12px"></div>
+              <div id="activityList" class="muted">No activity yet — place a trade or import history.</div>
+            </div>
+
+            <div style="height:12px"></div>
+
+            <div class="panel">
+              <strong>Market Snapshot</strong>
+              <div style="margin-top:10px" class="table-scroll">
+                <table id="stocksSnapshot">
+                  <thead><tr><th>Stock</th><th>Price</th><th>Change</th><th>Volume</th></tr></thead>
+                  <tbody></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <aside>
+            <div class="panel">
+              <strong>Price Prediction (Quick)</strong>
+              <div class="muted" style="margin-top:8px">Select a stock from Stocks view for detailed predictions.</div>
+              <div style="margin-top:12px">
+                <div class="muted">Top model confidence</div>
+                <div style="font-weight:700;margin-top:6px" id="topModel">—</div>
+                <div style="height:10px"></div>
+                <div class="muted">AI Fraud monitor</div>
+                <div style="margin-top:8px"><span class="status-dot" id="aiDot" style="background:var(--safe)"></span><span id="aiText">No issues</span></div>
+              </div>
+            </div>
+
+            <div style="height:12px"></div>
+
+            <div class="panel">
+              <strong>Quick Actions</strong>
+              <div style="display:flex;flex-direction:column;gap:8px;margin-top:8px">
+                <button id="btnPlaceTrade" class="btn primary">New Trade</button>
+                <button id="btnViewAlerts" class="btn ghost">Open Alerts</button>
+                <button id="btnPredictions" class="btn ghost">View Predictions</button>
+              </div>
+            </div>
+          </aside>
+        </div>
+      </div>
+
+      <!-- Stocks view -->
+      <div id="view-stocks" class="view" style="display:none">
+        <div class="card">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div>
+              <strong>Stocks</strong>
+              <div class="muted">Search, view price and place a trade</div>
+            </div>
+            <div style="display:flex;gap:8px;align-items:center">
+              <input id="stockSearch" placeholder="Search by company or stock id" />
+              <select id="filterSector"><option value="">All sectors</option></select>
+            </div>
+          </div>
+
+          <div style="height:12px"></div>
+
+          <div class="table-scroll">
+            <table id="stocksTable">
+              <thead><tr><th>Stock ID</th><th>Company</th><th>Price</th><th>Daily H/L</th><th>Volume</th><th></th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Predictions view -->
+      <div id="view-predictions" class="view" style="display:none">
+        <div class="card">
+          <strong>AI-Based Price Predictions</strong>
+          <div class="muted" style="margin-top:6px">Select a stock and view model forecast</div>
+
+          <div style="display:flex;gap:10px;margin-top:10px;align-items:center">
+            <select id="predStock"></select>
+            <select id="predHorizon"><option value="7">7 days</option><option value="30">30 days</option></select>
+            <button id="generatePred" class="btn primary">Generate</button>
+          </div>
+
+          <div style="height:12px"></div>
+          <div class="panel" id="predPanel" style="min-height:160px">
+            <div id="predGraph" class="muted">No prediction yet</div>
+            <div style="height:10px"></div>
+            <div class="muted">Model accuracy: <span id="modelAccuracy">—</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Trades view -->
+      <div id="view-trades" class="view" style="display:none">
+        <div class="card">
+          <strong>My Trades</strong>
+          <div class="muted">All executed and pending trades</div>
+          <div style="height:10px"></div>
+          <div class="table-scroll">
+            <table id="tradesTable">
+              <thead><tr><th>Trade ID</th><th>Stock</th><th>Amount</th><th>Price</th><th>Date</th><th>Status</th><th></th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Alerts view -->
+      <div id="view-alerts" class="view" style="display:none">
+        <div class="card">
+          <strong>Fraud Alerts</strong>
+          <div class="muted">Detected suspicious activities</div>
+          <div style="height:10px"></div>
+          <div class="table-scroll">
+            <table id="alertsTable">
+              <thead><tr><th>Alert ID</th><th>Type</th><th>Trade ID</th><th>Risk</th><th>Date</th><th></th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Profile view -->
+      <div id="view-profile" class="view" style="display:none">
+        <div class="card">
+          <strong>Profile & Settings</strong>
+          <div style="margin-top:8px">
+            <div class="muted">Name</div>
+            <input id="profileName" />
+            <div style="height:8px"></div>
+            <div class="muted">Email</div>
+            <input id="profileEmail" />
+            <div style="height:12px"></div>
+            <button id="saveProfile" class="btn primary">Save</button>
+          </div>
+        </div>
+      </div>
+
+      <footer>System prototype — data is simulated locally for demo purposes.</footer>
+    </main>
+  </div>
+
+  <!-- MODAL: Place Trade -->
+  <div id="modalTrade" class="modal-backdrop">
+    <div class="modal" role="dialog" aria-modal="true">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <strong>Place New Trade</strong>
+        <button id="closeTradeModal" class="btn ghost">Close</button>
+      </div>
+      <div style="height:12px"></div>
+
+      <div class="row">
+        <div class="col">
+          <label class="small-muted">Stock</label>
+          <select id="tradeStock"></select>
+
+          <div style="height:8px"></div>
+          <label class="small-muted">Buyer Institution</label>
+          <input id="tradeBuyer" placeholder="Buyer Institution" />
+          <div style="height:8px"></div>
+
+          <label class="small-muted">Seller Institution</label>
+          <input id="tradeSeller" placeholder="Seller Institution" />
+        </div>
+
+        <div style="width:220px">
+          <label class="small-muted">Amount (shares)</label>
+          <input id="tradeAmount" type="number" min="1" value="10" />
+          <div style="height:8px"></div>
+          <label class="small-muted">Price per share</label>
+          <input id="tradePrice" type="number" min="0" step="0.01" />
+          <div style="height:8px"></div>
+
+          <div style="height:8px"></div>
+          <div style="display:flex;gap:8px">
+            <button id="checkFraud" class="btn ghost">Check AI Fraud Score</button>
+            <button id="submitTrade" class="btn primary">Submit</button>
+          </div>
+          <div style="height:10px"></div>
+          <div class="muted">Fraud Score: <strong id="fraudScore">—</strong></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  /*******************************
+   * Sample data (mimics DB tables)
+   *******************************/
+  const sampleStocks = [
+    {stockId:'STK-1001', company:'Alpha Holdings', sector:'Finance', price:142.35, high:145.0, low:140.5, volume:12000},
+    {stockId:'STK-1002', company:'Beta Motors', sector:'Auto', price:38.20, high:39.1, low:37.6, volume:32000},
+    {stockId:'STK-1003', company:'Gamma Soft', sector:'Tech', price:253.10, high:260.0, low:250.0, volume:8000},
+    {stockId:'STK-1004', company:'Delta Bank', sector:'Finance', price:88.40, high:90.0, low:87.0, volume:21000},
+    {stockId:'STK-1005', company:'Epsilon Energy', sector:'Energy', price:61.70, high:63.0, low:60.0, volume:17000},
+  ];
+
+  let trades = []; // will store trade records (DB: Trades)
+  let alerts = []; // fraud alerts (DB: Fraud_Alerts)
+
+  /*******************************
+   * Utilities and UI wiring
+   *******************************/
+  const $ = (id)=>document.getElementById(id);
+  const q = (sel)=>document.querySelector(sel);
+  const all = (sel)=>Array.from(document.querySelectorAll(sel));
+
+  // initial view
+  function showView(name){
+    all('.view').forEach(v=>v.style.display='none');
+    const el = $('view-'+name);
+    if(el) el.style.display='';
+    // nav active
+    all('.nav button').forEach(b=>b.classList.toggle('active', b.dataset.view===name));
+    $('pageTitle').textContent = name.charAt(0).toUpperCase() + name.slice(1);
+  }
+
+  // fill stocks table
+  function renderStocks(filter=''){
+    const tbody = $('stocksTable').querySelector('tbody');
+    tbody.innerHTML='';
+    const rows = sampleStocks.filter(s=>{
+      if(!filter) return true;
+      return s.company.toLowerCase().includes(filter) || s.stockId.toLowerCase().includes(filter);
+    }).map(s=>{
+      const change = ((s.price - ((s.high+s.low)/2))/((s.high+s.low)/2)*100).toFixed(2)
+      return `<tr>
+        <td>${s.stockId}</td>
+        <td>${s.company}</td>
+        <td>$${s.price.toFixed(2)}</td>
+        <td>${s.high.toFixed(2)}/${s.low.toFixed(2)}</td>
+        <td>${s.volume.toLocaleString()}</td>
+        <td style="text-align:right"><button class="trade-btn" data-stock="${s.stockId}">Trade</button></td>
+      </tr>`
+    }).join('');
+    tbody.innerHTML = rows || '<tr><td colspan="6" class="muted">No stocks found</td></tr>';
+    // wire trade buttons
+    tbody.querySelectorAll('.trade-btn').forEach(btn=>{
+      btn.onclick = ()=>openTradeModal(btn.dataset.stock);
+    });
+    // snapshot small table
+    const snap = $('stocksSnapshot').querySelector('tbody');
+    snap.innerHTML = sampleStocks.slice(0,5).map(s=>`<tr><td>${s.stockId}</td><td>$${s.price.toFixed(2)}</td><td class="muted">${(s.price/s.low-1).toFixed(2)}%</td><td>${s.volume.toLocaleString()}</td></tr>`).join('');
+  }
+
+  // render trades table
+  function renderTrades(){
+    const tbody = $('tradesTable').querySelector('tbody');
+    if(trades.length===0){tbody.innerHTML='<tr><td colspan="7" class="muted">No trades yet</td></tr>'; return;}
+    tbody.innerHTML = trades.map(t=>`<tr>
+      <td>${t.id}</td>
+      <td>${t.stockId}</td>
+      <td>${t.amount.toLocaleString()}</td>
+      <td>$${t.price.toFixed(2)}</td>
+      <td>${(new Date(t.date)).toLocaleString()}</td>
+      <td>${t.status}</td>
+      <td style="text-align:right"><button class="btn ghost" data-id="${t.id}">View</button></td>
+    </tr>`).join('');
+    tbody.querySelectorAll('button').forEach(b=>b.onclick=()=>alert(JSON.stringify(trades.find(x=>x.id===b.dataset.id),null,2)));
+  }
+
+  // render alerts
+  function renderAlerts(){
+    const tbody = $('alertsTable').querySelector('tbody');
+    if(alerts.length===0){tbody.innerHTML='<tr><td colspan="6" class="muted">No alerts</td></tr>'; return;}
+    tbody.innerHTML = alerts.map(a=>`<tr>
+      <td>${a.id}</td>
+      <td>${a.type}</td>
+      <td>${a.tradeId || '-'}</td>
+      <td style="color:${a.risk==='High'? 'var(--danger)': a.risk==='Medium'?'var(--warn)':'var(--safe)'}">${a.risk}</td>
+      <td>${(new Date(a.date)).toLocaleString()}</td>
+      <td style="text-align:right"><button class="btn ghost" data-aid="${a.id}">Details</button></td>
+    </tr>`).join('');
+    tbody.querySelectorAll('button').forEach(b=>b.onclick=()=>alert(JSON.stringify(alerts.find(x=>x.id===b.dataset.aid),null,2)));
+  }
+
+  // activity list
+  function renderActivity(){
+    const el = $('activityList');
+    if(trades.length==0){
+      el.textContent = 'No activity yet — place a trade to generate activity';
+      return;
+    }
+    el.innerHTML = trades.slice(-5).reverse().map(t=>`<div style="padding:6px 0;border-bottom:1px dashed #eef6ff">
+      <strong>${t.stockId}</strong> — ${t.amount} shares @ $${t.price.toFixed(2)} (${t.status}) <div class="muted">${(new Date(t.date)).toLocaleString()}</div>
+    </div>`).join('');
+  }
+
+  // show modal
+  function openTradeModal(stockId){
+    $('modalTrade').style.display='flex';
+    $('tradeStock').innerHTML = sampleStocks.map(s=>`<option value="${s.stockId}">${s.stockId} — ${s.company}</option>`).join('');
+    $('tradeStock').value = stockId || sampleStocks[0].stockId;
+    const s = sampleStocks.find(x=>x.stockId===$('tradeStock').value);
+    $('tradePrice').value = s ? s.price : 0;
+    $('fraudScore').textContent = '—';
+  }
+  function closeTradeModal(){ $('modalTrade').style.display='none'; }
+
+  // simulate fraud score (AI)
+  function computeFraudScore(stockId, amount, price){
+    // crude heuristic: high volume and odd prices -> higher score
+    const s = sampleStocks.find(x=>x.stockId===stockId) || {};
+    const volFactor = (s.volume || 1)/20000;
+    const priceFactor = Math.abs(price - (s.price||price)) / (s.price||1);
+    let score = Math.min(98, Math.round((volFactor*40 + priceFactor*200 + Math.random()*30)));
+    if(score > 75) return {score, risk:'High'};
+    if(score > 40) return {score, risk:'Medium'};
+    return {score, risk:'Low'};
+  }
+
+  // submit trade
+  function submitTrade(){
+    const stockId = $('tradeStock').value;
+    const buyer = $('tradeBuyer').value || 'Demo Buyer';
+    const seller = $('tradeSeller').value || 'Demo Seller';
+    const amount = Number($('tradeAmount').value) || 0;
+    const price = Number($('tradePrice').value) || 0;
+    const id = 'TR-'+Math.floor(Math.random()*900000 + 100000);
+    const rec = {id, stockId, buyer, seller, amount, price, date:Date.now(), status: 'Pending'};
+    trades.push(rec);
+    // compute fraud
+    const f = computeFraudScore(stockId, amount, price);
+    $('fraudScore').textContent = `${f.score} (${f.risk})`;
+    if(f.risk === 'High'){
+      // generate alert
+      const alert = {id:'AL-'+Math.floor(Math.random()*90000+10000), type:'Abnormal trade', tradeId:id, risk:'High', date:Date.now(), info:`score ${f.score}`};
+      alerts.push(alert);
+      alertUser('High risk trade flagged — alert created.');
+    } else {
+      alertUser('Trade submitted. Fraud score: '+f.score+' ('+f.risk+')');
+    }
+    renderTrades(); renderAlerts(); renderActivity(); updateDashboardCounts();
+    closeTradeModal();
+  }
+
+  // simple notification
+  function alertUser(msg){
+    // small toast
+    const t = document.createElement('div');
+    t.style.position='fixed'; t.style.right='18px'; t.style.bottom='18px';
+    t.style.background='white'; t.style.padding='10px 12px'; t.style.borderRadius='10px';
+    t.style.boxShadow='0 8px 30px rgba(10,30,60,0.12)'; t.style.fontSize='13px';
+    t.textContent = msg;
+    document.body.appendChild(t);
+    setTimeout(()=>{ t.style.transition='all 0.3s'; t.style.opacity=0; setTimeout(()=>t.remove(),300); }, 2800);
+  }
+
+  // Predictions simple generator
+  function generatePrediction(stockId, horizon){
+    const s = sampleStocks.find(x=>x.stockId===stockId);
+    if(!s){ $('predGraph').textContent='Stock not found'; return; }
+    // simple random-walk forecast around current price
+    const days = Number(horizon);
+    let base = s.price;
+    const series = [];
+    for(let i=0;i<days;i++){
+      const change = (Math.random()-0.45) * (base*0.03); // +/- ~3%
+      base = Math.max(0.1, base + change);
+      series.push(base);
+    }
+    // render as tiny sparkline
+    const max = Math.max(...series), min = Math.min(...series);
+    const w = 680, h = 120;
+    let svg = `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" xmlns="http://www.w3.org/2000/svg">
+      <rect width="${w}" height="${h}" fill="white" rx="8" />
+      <polyline fill="none" stroke="#1565c0" stroke-width="2" points="`;
+    series.forEach((v,i)=>{
+      const x = (i/(series.length-1 || 1))*(w-40)+20;
+      const y = 10 + (1 - ((v-min)/(max-min || 1)))*(h-20);
+      svg += `${x},${y} `;
+    });
+    svg += `"/></svg>`;
+    $('predGraph').innerHTML = svg;
+    $('modelAccuracy').textContent = (70 + Math.floor(Math.random()*20)) + '%';
+  }
+
+  // update dashboard numbers
+  function updateDashboardCounts(){
+    $('totalTrades').textContent = trades.length;
+    $('pendingOrders').textContent = trades.filter(t=>t.status==='Pending').length;
+    const pv = trades.reduce((s,t)=>s + t.amount * t.price, 0);
+    $('portfolioValue').textContent = pv ? '$'+pv.toFixed(2) : '$0.00';
+    $('openAlerts').textContent = alerts.length;
+  }
+
+  /*******************************
+   * Wire up events
+   *******************************/
+  document.addEventListener('click', (e)=>{
+    if(e.target.matches('.nav button')) showView(e.target.dataset.view);
+    if(e.target.id==='logoutBtn'){ $('app').style.display='none'; $('login').style.display='flex'; }
+  });
+
+  // top-level search
+  $('globalSearch').addEventListener('input', (e)=>{
+    const t = e.target.value.trim().toLowerCase();
+    if(t.length>0){
+      // quick search: if matches stock show stocks view
+      if(sampleStocks.some(s=>s.stockId.toLowerCase().includes(t) || s.company.toLowerCase().includes(t))){
+        showView('stocks'); renderStocks(t);
+      } else {
+        // search trades & alerts
+        showView('trades'); renderTrades();
+      }
+    }
+  });
+
+  // sidebar nav
+  all('.nav button').forEach(b=>b.onclick = ()=>{ showView(b.dataset.view); });
+
+  // page buttons
+  $('placeTradeQuick').onclick = ()=>{ openTradeModal(); };
+  $('btnPlaceTrade').onclick = ()=>openTradeModal();
+  $('btnViewAlerts').onclick = ()=>showView('alerts');
+  $('btnPredictions').onclick = ()=>showView('predictions');
+  $('viewAllTrades').onclick = ()=>showView('trades');
+
+  // modal close
+  $('closeTradeModal').onclick = ()=>closeTradeModal();
+  $('modalTrade').onclick = (e)=>{ if(e.target.id==='modalTrade') closeTradeModal(); }
+
+  // trade modal actions
+  $('checkFraud').onclick = ()=>{
+    const s = $('tradeStock').value; const amount = Number($('tradeAmount').value); const price = Number($('tradePrice').value);
+    const res = computeFraudScore(s, amount, price);
+    $('fraudScore').textContent = `${res.score} (${res.risk})`;
+    if(res.risk==='High') alertUser('Warning: High fraud risk detected.');
+  };
+  $('submitTrade').onclick = ()=>submitTrade();
+
+  // predictions
+  $('generatePred').onclick = ()=>{
+    const s = $('predStock').value; const h = $('predHorizon').value;
+    generatePrediction(s, h);
+  }
+
+  // login logic
+  $('demoLogin').addEventListener('click', ()=>{ doLogin('Demo Trader','demo@local'); });
+  $('loginBtn').addEventListener('click', ()=>{ doLogin($('email').value || 'Demo Trader', $('email').value||'demo@local'); });
+
+  function doLogin(name,email){
+    $('login').style.display='none'; $('app').style.display='';
+    $('usernameDisplay').textContent = name;
+    initApp();
+  }
+
+  // initial population
+  function initApp(){
+    renderStocks();
+    renderTrades();
+    renderAlerts();
+    renderActivity();
+    updateDashboardCounts();
+
+    // fill selects
+    $('tradeStock').innerHTML = sampleStocks.map(s=>`<option value="${s.stockId}">${s.stockId} — ${s.company}</option>`).join('');
+    $('predStock').innerHTML = sampleStocks.map(s=>`<option value="${s.stockId}">${s.stockId} — ${s.company}</option>`).join('');
+    $('filterSector').innerHTML = `<option value="">All sectors</option>` + [...new Set(sampleStocks.map(s=>s.sector))].map(x=>`<option value="${x}">${x}</option>`).join('');
+  }
+
+  // demo: add a few fake trades and alerts for visualization
+  (function seedDemo(){
+    const t1 = {id:'TR-100001', stockId:'STK-1001', buyer:'Alpha Bank', seller:'Investor A', amount:100, price:142.10, date:Date.now()-1000*60*60*6, status:'Completed'};
+    const t2 = {id:'TR-100002', stockId:'STK-1003', buyer:'Gamma Fund', seller:'Investor B', amount:50, price:254.00, date:Date.now()-1000*60*60*2, status:'Completed'};
+    trades.push(t1,t2);
+    alerts.push({id:'AL-701', type:'Price anomaly', tradeId:'TR-100002', risk:'Medium', date:Date.now()-1000*60*50, info:'Unusual abrupt price spike'});
+  })();
+
+  // initial show
+  showView('dashboard');
+  renderStocks();
+  renderTrades();
+  renderAlerts();
+  renderActivity();
+  updateDashboardCounts();
+
+</script>
+</body>
+</html>
