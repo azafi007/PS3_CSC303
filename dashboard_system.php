@@ -268,14 +268,21 @@ $role_values = [
   <!-- MAIN CONTENT -->
   <main class="flex-grow-1 p-4 content-area">
 
-    <!-- OVERVIEW WITH KPIs + CHARTS -->
+    <!-- OVERVIEW WITH KPIs + SEARCH + CHARTS -->
     <div id="overview">
-      <div class="d-flex justify-content-between align-items-center mb-3">
+      <div class="d-flex justify-content-between align-items-end mb-3 flex-wrap gap-2">
         <div>
           <h3>System Overview</h3>
           <p class="text-muted mb-0">Overall activity and participant distribution for the system.</p>
         </div>
-        <!-- All-time / Export removed -->
+        <div style="min-width:240px;">
+          <label class="form-label small mb-1 text-muted">Search in dashboard tables</label>
+          <div class="input-group input-group-sm">
+            <span class="input-group-text bg-white border-end-0">🔍</span>
+            <input type="text" id="globalSearch" class="form-control border-start-0"
+                   placeholder="Search staff, stocks, transactions...">
+          </div>
+        </div>
       </div>
 
       <!-- KPI CARDS WITH MANAGE LINKS -->
@@ -627,79 +634,112 @@ $role_values = [
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-// data for Chart.js [web:86][web:89]
-const txLabels   = <?php echo json_encode($tx_labels); ?>;
-const txValues   = <?php echo json_encode($tx_values); ?>;
-const phLabels   = <?php echo json_encode($ph_labels); ?>;
-const phValues   = <?php echo json_encode($ph_values); ?>;
-const roleLabels = <?php echo json_encode($role_labels); ?>;
-const roleValues = <?php echo json_encode($role_values); ?>;
+document.addEventListener('DOMContentLoaded', function () {
+  const searchInput = document.getElementById('globalSearch');
+  if (!searchInput) return;
 
-// bar: transactions per participant
-new Chart(document.getElementById('txPerParticipant'), {
-  type: 'bar',
-  data: {
-    labels: txLabels,
-    datasets: [{
-      label: 'Transactions',
-      data: txValues,
-      backgroundColor: 'rgba(54, 162, 235, 0.7)'
-    }]
-  },
-  options: {
-    responsive: true,
-    plugins: { legend: { display: false } },
-    scales: {
-      x: { ticks: { autoSkip: false } },
-      y: { beginAtZero: true }
+  // ---------- GLOBAL TABLE SEARCH WITH AUTO-SCROLL ----------
+  function applySearch(autoScroll) {
+    const term = searchInput.value.toLowerCase();
+    let firstMatchRow = null;
+
+    document.querySelectorAll('table tbody').forEach(function (tbody) {
+      tbody.querySelectorAll('tr').forEach(function (row) {
+        const text = row.innerText.toLowerCase();
+        const match = term === '' || text.indexOf(term) !== -1;
+        row.style.display = match ? '' : 'none';
+        if (match && !firstMatchRow && term !== '') {
+          firstMatchRow = row;
+        }
+      });
+    });
+
+    if (autoScroll && firstMatchRow) {
+      firstMatchRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
   }
-});
 
-// line: price history
-new Chart(document.getElementById('priceHistory'), {
-  type: 'line',
-  data: {
-    labels: phLabels,
-    datasets: [{
-      label: 'Closing Price',
-      data: phValues,
-      borderColor: 'rgba(75, 192, 192, 1)',
-      backgroundColor: 'rgba(75, 192, 192, 0.2)',
-      tension: 0.2,
-      fill: true
-    }]
-  },
-  options: {
-    responsive: true,
-    plugins: { legend: { display: false } },
-    scales: {
-      x: { ticks: { maxTicksLimit: 6 } },
-      y: { beginAtZero: false }
+  // live filter as user types
+  searchInput.addEventListener('keyup', function (e) {
+    const autoScroll = (e.key === 'Enter');
+    applySearch(autoScroll);
+  });
+
+  // ---------- CHART.JS DATA ----------
+  const txLabels   = <?php echo json_encode($tx_labels); ?>;
+  const txValues   = <?php echo json_encode($tx_values); ?>;
+  const phLabels   = <?php echo json_encode($ph_labels); ?>;
+  const phValues   = <?php echo json_encode($ph_values); ?>;
+  const roleLabels = <?php echo json_encode($role_labels); ?>;
+  const roleValues = <?php echo json_encode($role_values); ?>;
+
+  // bar: transactions per participant
+  new Chart(document.getElementById('txPerParticipant'), {
+    type: 'bar',
+    data: {
+      labels: txLabels,
+      datasets: [{
+        label: 'Transactions',
+        data: txValues,
+        backgroundColor: 'rgba(54, 162, 235, 0.7)'
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { ticks: { autoSkip: false } },
+        y: { beginAtZero: true }
+      }
     }
-  }
-});
+  });
 
-// pie: participant roles
-new Chart(document.getElementById('participantRoles'), {
-  type: 'pie',
-  data: {
-    labels: roleLabels,
-    datasets: [{
-      data: roleValues,
-      backgroundColor: [
-        'rgba(54, 162, 235, 0.7)',
-        'rgba(255, 159, 64, 0.7)',
-        'rgba(75, 192, 192, 0.7)',
-        'rgba(201, 203, 207, 0.7)'
-      ]
-    }]
-  },
-  options: {
-    responsive: true,
-    plugins: { legend: { position: 'bottom' } }
-  }
+  // line: price history
+  new Chart(document.getElementById('priceHistory'), {
+    type: 'line',
+    data: {
+      labels: phLabels,
+      datasets: [{
+        label: 'Closing Price',
+        data: phValues,
+        borderColor: 'rgba(75, 192, 192, 1)',
+        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+        tension: 0.2,
+        fill: true
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { ticks: { maxTicksLimit: 6 } },
+        y: { beginAtZero: false }
+      }
+    }
+  });
+
+  // pie: participant roles
+  new Chart(document.getElementById('participantRoles'), {
+    type: 'pie',
+    data: {
+      labels: roleLabels,
+      datasets: [{
+        data: roleValues,
+        backgroundColor: [
+          'rgba(54, 162, 235, 0.7)',
+          'rgba(255, 159, 64, 0.7)',
+          'rgba(75, 192, 192, 0.7)',
+          'rgba(201, 203, 207, 0.7)'
+        ]
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { position: 'bottom' } }
+    }
+  });
 });
 </script>
 </body>
 </html>
+
