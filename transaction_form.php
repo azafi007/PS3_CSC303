@@ -1,6 +1,7 @@
 <?php
 session_start();
 require_once 'config.php';
+require_once 'fraud_rules.php';
 
 $stocks = mysqli_query($conn,"SELECT StockID FROM stock");
 $parts  = mysqli_query($conn,"SELECT ParticipantID,name FROM transaction_participant");
@@ -18,22 +19,36 @@ if (isset($_GET['id'])) {
 
 if ($_SERVER['REQUEST_METHOD']==='POST') {
     $id    = $_POST['TransactionID']!=='' ? (int)$_POST['TransactionID'] : null;
-    $time  = $_POST['timeStamp'] ?: date('Y-m-d H:i:s');
+    $time  = $_POST['timeStamp'] ?: date('Y-m-d H:i:s');     // fallback to now
     $amt   = (float)$_POST['amount'];
     $sid   = (int)$_POST['StockID'];
     $pid   = (int)$_POST['ParticipantID'];
     $stfid = (int)$_POST['StaffID'];
 
     if ($id) {
+        // UPDATE existing transaction (optional: you can also re-run rules here if you want)
         $sql = "UPDATE stock_transaction
                 SET timeStamp='$time', amount=$amt, StockID=$sid,
                     ParticipantID=$pid, StaffID=$stfid
                 WHERE TransactionID=$id";
+        mysqli_query($conn,$sql);
+
+        // if you want to re-evaluate on edit, uncomment:
+        // evaluate_fraud_rules($conn, $id, $sid, $pid, $amt);
+
     } else {
+        // INSERT new transaction
         $sql = "INSERT INTO stock_transaction(timeStamp,amount,StockID,ParticipantID,StaffID)
                 VALUES('$time',$amt,$sid,$pid,$stfid)";
+        if (mysqli_query($conn,$sql)) {
+            // get new TransactionID
+            $newTxId = mysqli_insert_id($conn);
+
+            // RUN FRAUD RULES FOR THIS NEW TRANSACTION
+            evaluate_fraud_rules($conn, $newTxId, $sid, $pid, $amt);
+        }
     }
-    mysqli_query($conn,$sql);
+
     header("Location: transactions_list.php");
     exit;
 }
