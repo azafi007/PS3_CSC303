@@ -2,12 +2,31 @@
 session_start();
 require_once 'config.php';
 
-// DELETE
+if (!isset($_SESSION['username'])) {
+    header('Location: login.php');
+    exit;
+}
+
+$message = '';
+$message_type = 'warning';
+
+// DELETE with FK check
 if (isset($_GET['delete'])) {
     $id = (int) $_GET['delete'];
-    mysqli_query($conn, "DELETE FROM stock WHERE StockID=$id");
-    header("Location: stocks.php");
-    exit;
+
+    // check if this stock is used in stock_transaction
+    $check = mysqli_query($conn, "SELECT COUNT(*) AS c FROM stock_transaction WHERE StockID=$id");
+    $row   = mysqli_fetch_assoc($check);
+
+    if ($row && $row['c'] > 0) {
+        $count = (int)$row['c'];
+        $message = "Cannot delete StockID $id: it is used in $count transaction(s) in stock_transaction. Delete those transactions first.";
+        $message_type = 'danger';
+    } else {
+        mysqli_query($conn, "DELETE FROM stock WHERE StockID=$id");
+        $message = "StockID $id deleted successfully.";
+        $message_type = 'success';
+    }
 }
 
 // READ stocks
@@ -45,7 +64,6 @@ $res = mysqli_query($conn, $sql);
       background: linear-gradient(90deg,#00acc1,#43a047);
       color: #fff;
     }
-    .badge-soft { padding: 0.25rem 0.6rem; border-radius: 999px; font-size: 0.75rem; }
   </style>
 </head>
 <body>
@@ -59,6 +77,12 @@ $res = mysqli_query($conn, $sql);
       <a href="dashboard_system.php" class="btn btn-outline-light btn-sm">Back to Dashboard</a>
     </div>
     <div class="card-body">
+
+      <?php if ($message): ?>
+        <div class="alert alert-<?php echo $message_type; ?> py-2">
+          <?php echo htmlspecialchars($message); ?>
+        </div>
+      <?php endif; ?>
 
       <div class="d-flex justify-content-between align-items-center mb-3">
         <a href="stock_form.php" class="btn btn-success btn-sm">+ Add Stock</a>
@@ -88,7 +112,7 @@ $res = mysqli_query($conn, $sql);
               <td class="text-end">
                 <a href="stock_form.php?id=<?php echo $r['StockID']; ?>" class="btn btn-primary btn-sm">Edit</a>
                 <a href="stocks.php?delete=<?php echo $r['StockID']; ?>"
-                   onclick="return confirm('Delete this stock?');"
+                   onclick="return confirm('Delete this stock? If it has transactions, deletion will be blocked.');"
                    class="btn btn-danger btn-sm">Delete</a>
               </td>
             </tr>
