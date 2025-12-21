@@ -205,13 +205,12 @@ $role_values = [
   <meta charset="UTF-8">
   <title>Financial Institution – System Dashboard</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> <!-- [web:82][web:88] -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     body { background-color: #f5f6fa; }
     .content-area { max-height: 100vh; overflow-y: auto; }
     .section-title { margin-top: 40px; margin-bottom: 10px; }
 
-    /* Colorful top navbar */
     .navbar-gradient {
         background: linear-gradient(90deg, #0d6efd, #6610f2, #ff6f61);
     }
@@ -285,7 +284,7 @@ $role_values = [
         </div>
       </div>
 
-      <!-- KPI CARDS WITH MANAGE LINKS -->
+      <!-- KPI CARDS -->
       <div class="row g-3 mb-4">
         <div class="col-6 col-md-2">
           <div class="card text-center shadow-sm">
@@ -437,92 +436,94 @@ $role_values = [
       </div>
     </div>
 
-    <!-- TRANSACTIONS & TRADES -->
+    <!-- TRANSACTIONS & TRADES (Trades below Transactions) -->
     <h4 id="tx" class="section-title">Transactions & Trades</h4>
     <div class="mb-2">
       <a href="transactions_list.php" class="btn btn-success btn-sm">Add / Edit Transactions</a>
+      <a href="trades_manage.php" class="btn btn-primary btn-sm ms-2">Add / Edit Trades</a>
     </div>
-    <div class="row">
-      <div class="col-lg-7">
-        <div class="card mb-4 shadow-sm">
-          <div class="card-header small text-muted">Recent Stock Transactions</div>
-          <div class="card-body">
-            <div class="table-responsive">
-              <table class="table table-sm table-hover align-middle mb-0">
-                <thead class="table-light">
-                  <tr>
-                    <th>ID</th><th>Time</th><th>Amount</th><th>Stock</th><th>Participant</th><th>Staff</th>
-                  </tr>
-                </thead>
-                <tbody>
-                <?php while($r = mysqli_fetch_assoc($tx_res)): ?>
-                  <tr>
-                    <td><?php echo $r['TransactionID']; ?></td>
-                    <td><?php echo $r['timeStamp']; ?></td>
-                    <td><?php echo $r['amount']; ?></td>
-                    <td><?php echo $r['StockID']; ?></td>
-                    <td><?php echo htmlspecialchars($r['participant']); ?></td>
-                    <td><?php echo htmlspecialchars($r['staffName']); ?></td>
-                  </tr>
-                <?php endwhile; ?>
-                </tbody>
-              </table>
-            </div>
-          </div>
+
+    <!-- Recent Stock Transactions -->
+    <div class="card mb-4 shadow-sm">
+      <div class="card-header small text-muted">Recent Stock Transactions</div>
+      <div class="card-body">
+        <div class="table-responsive">
+          <table class="table table-sm table-hover align-middle mb-0">
+            <thead class="table-light">
+              <tr>
+                <th>ID</th><th>Time</th><th>Amount</th><th>Stock</th><th>Participant</th><th>Staff</th>
+              </tr>
+            </thead>
+            <tbody>
+            <?php while($r = mysqli_fetch_assoc($tx_res)): ?>
+              <tr>
+                <td><?php echo $r['TransactionID']; ?></td>
+                <td><?php echo $r['timeStamp']; ?></td>
+                <td><?php echo $r['amount']; ?></td>
+                <td><?php echo $r['StockID']; ?></td>
+                <td><?php echo htmlspecialchars($r['participant']); ?></td>
+                <td><?php echo htmlspecialchars($r['staffName']); ?></td>
+              </tr>
+            <?php endwhile; ?>
+            </tbody>
+          </table>
         </div>
       </div>
-      <div class="col-lg-5">
-        <div class="card mb-4 shadow-sm">
-          <div class="card-header small text-muted">Recent Trades</div>
-          <div class="card-body">
-            <div class="table-responsive">
-              <table class="table table-sm table-hover align-middle mb-0">
-                <thead class="table-light">
-                  <tr>
-                    <th>ID</th><th>Date</th><th>Amount</th><th>Buyer</th><th>Seller</th>
-                  </tr>
-                </thead>
-                <tbody>
-                <?php while($r = mysqli_fetch_assoc($trade_res)): ?>
-                  <tr>
-                    <td><?php echo $r['TradeID']; ?></td>
-                    <td><?php echo $r['tradeDate']; ?></td>
-                    <td><?php echo $r['tradeAmount']; ?></td>
-                    <td><?php echo htmlspecialchars($r['buyer']); ?></td>
-                    <td><?php echo htmlspecialchars($r['seller']); ?></td>
-                  </tr>
-                <?php endwhile; ?>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
+    </div>
 
-        <div class="card mb-4 shadow-sm">
-          <div class="card-header small text-muted">Recent Staff Activity (Logs)</div>
-          <div class="card-body">
-            <div class="table-responsive">
-              <table class="table table-sm table-hover align-middle mb-0">
-                <thead class="table-light">
-                  <tr>
-                    <th>Staff</th><th>Activity</th><th>Login Time</th><th>Trade Approval</th>
-                  </tr>
-                </thead>
-                <tbody>
-                <?php while($r = mysqli_fetch_assoc($logs_res)): ?>
-                  <tr>
-                    <td><?php echo htmlspecialchars($r['staffName']); ?></td>
-                    <td><?php echo htmlspecialchars($r['activity']); ?></td>
-                    <td><?php echo $r['loginTime']; ?></td>
-                    <td><?php echo htmlspecialchars($r['tradeApproval']); ?></td>
-                  </tr>
-                <?php endwhile; ?>
-                </tbody>
-              </table>
-            </div>
-          </div>
+    <!-- Recent Trades -->
+    <div class="card mb-4 shadow-sm">
+      <div class="card-header small text-muted">Recent Trades</div>
+      <div class="card-body">
+        <div class="table-responsive">
+          <table class="table table-sm table-hover align-middle mb-0">
+            <thead class="table-light">
+              <tr>
+                <th>ID</th><th>Date</th><th>Amount</th><th>Buyer</th><th>Seller</th>
+              </tr>
+            </thead>
+            <tbody>
+            <?php while($r = mysqli_fetch_assoc($trade_res)): ?>
+              <tr>
+                <td><?php echo $r['TradeID']; ?></td>
+                <td><?php echo $r['tradeDate']; ?></td>
+                <td><?php echo $r['tradeAmount']; ?></td>
+                <td><?php echo htmlspecialchars($r['buyer']); ?></td>
+                <td><?php echo htmlspecialchars($r['seller']); ?></td>
+              </tr>
+            <?php endwhile; ?>
+            </tbody>
+          </table>
         </div>
+      </div>
+    </div>
 
+    <!-- Recent Staff Activity (Logs) with Manage button -->
+    <div class="card mb-4 shadow-sm">
+      <div class="card-header d-flex justify-content-between align-items-center small text-muted">
+        <span>Recent Staff Activity (Logs)</span>
+        <a href="logs_list.php" class="btn btn-outline-primary btn-sm">Manage Logs</a>
+      </div>
+      <div class="card-body">
+        <div class="table-responsive">
+          <table class="table table-sm table-hover align-middle mb-0">
+            <thead class="table-light">
+              <tr>
+                <th>Staff</th><th>Activity</th><th>Login Time</th><th>Trade Approval</th>
+              </tr>
+            </thead>
+            <tbody>
+            <?php while($r = mysqli_fetch_assoc($logs_res)): ?>
+              <tr>
+                <td><?php echo htmlspecialchars($r['staffName']); ?></td>
+                <td><?php echo htmlspecialchars($r['activity']); ?></td>
+                <td><?php echo $r['loginTime']; ?></td>
+                <td><?php echo htmlspecialchars($r['tradeApproval']); ?></td>
+              </tr>
+            <?php endwhile; ?>
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
 
@@ -638,7 +639,6 @@ document.addEventListener('DOMContentLoaded', function () {
   const searchInput = document.getElementById('globalSearch');
   if (!searchInput) return;
 
-  // ---------- GLOBAL TABLE SEARCH WITH AUTO-SCROLL ----------
   function applySearch(autoScroll) {
     const term = searchInput.value.toLowerCase();
     let firstMatchRow = null;
@@ -659,13 +659,11 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   }
 
-  // live filter as user types
   searchInput.addEventListener('keyup', function (e) {
     const autoScroll = (e.key === 'Enter');
     applySearch(autoScroll);
   });
 
-  // ---------- CHART.JS DATA ----------
   const txLabels   = <?php echo json_encode($tx_labels); ?>;
   const txValues   = <?php echo json_encode($tx_values); ?>;
   const phLabels   = <?php echo json_encode($ph_labels); ?>;
@@ -673,7 +671,6 @@ document.addEventListener('DOMContentLoaded', function () {
   const roleLabels = <?php echo json_encode($role_labels); ?>;
   const roleValues = <?php echo json_encode($role_values); ?>;
 
-  // bar: transactions per participant
   new Chart(document.getElementById('txPerParticipant'), {
     type: 'bar',
     data: {
@@ -694,7 +691,6 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   });
 
-  // line: price history
   new Chart(document.getElementById('priceHistory'), {
     type: 'line',
     data: {
@@ -718,7 +714,6 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   });
 
-  // pie: participant roles
   new Chart(document.getElementById('participantRoles'), {
     type: 'pie',
     data: {
@@ -742,4 +737,3 @@ document.addEventListener('DOMContentLoaded', function () {
 </script>
 </body>
 </html>
-
