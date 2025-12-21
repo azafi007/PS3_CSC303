@@ -2,11 +2,12 @@
 session_start();
 require_once 'config.php';
 
-// force login
-if (!isset($_SESSION['username'])) {
+// force admin login only
+if (!isset($_SESSION['username']) || ($_SESSION['user_role'] ?? '') !== 'admin') {
     header('Location: login.php');
     exit;
 }
+
 
 // quick counts
 $counts = [];
@@ -406,6 +407,7 @@ $role_values = [
     <h4 id="stock" class="section-title">Stock & Market View</h4>
     <div class="mb-2">
       <a href="stocks.php" class="btn btn-success btn-sm">Add / Edit Stocks</a>
+      <a href="prediction_manage.php" class="btn btn-primary btn-sm ms-2">Manage Predictions</a>
     </div>
     <div class="card mb-4 shadow-sm">
       <div class="card-body">

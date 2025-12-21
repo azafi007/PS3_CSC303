@@ -2,9 +2,13 @@
 session_start();
 require_once 'config.php';
 
-// If already logged in, go straight to dashboard
-if (isset($_SESSION['username'])) {
-    header('Location: dashboard_system.php');
+// If already logged in, go straight to correct dashboard
+if (isset($_SESSION['username'], $_SESSION['user_role'])) {
+    if ($_SESSION['user_role'] === 'admin') {
+        header('Location: dashboard_system.php');
+    } elseif ($_SESSION['user_role'] === 'fa') {
+        header('Location: ../Financial_Analyst/dashboard_analyst.php');
+    }
     exit;
 }
 
@@ -13,29 +17,48 @@ $error = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $user = trim($_POST['username'] ?? '');
     $pass = trim($_POST['password'] ?? '');
+    $role = $_POST['role'] ?? '';   // 'admin' or 'fa'
 
-    if ($user === '' || $pass === '') {
-        $error = 'Please enter both username and password.';
+    if ($user === '' || $pass === '' || $role === '') {
+        $error = 'Please enter username, password, and select a role.';
     } else {
-        // SIMPLE DEMO: hard-coded login
-        // username: admin, password: 1234
-        if ($user === 'admin' && $pass === '1234') {
-            $_SESSION['username'] = 'admin';
-            $_SESSION['staff_id'] = 0; // demo id
+
+        // DEMO CREDENTIALS – change these to what you want
+        $adminUser = 'admin';
+        $adminPass = '1234';
+
+        $faUser    = 'analyst';
+        $faPass    = '5678';
+
+        $ok = false;
+
+        if ($role === 'admin' && $user === $adminUser && $pass === $adminPass) {
+            $_SESSION['username']  = $adminUser;
+            $_SESSION['user_role'] = 'admin';
+            $ok = true;
             header('Location: dashboard_system.php');
             exit;
-        } else {
-            $error = 'Invalid username or password.';
+        }
+
+        if ($role === 'fa' && $user === $faUser && $pass === $faPass) {
+            $_SESSION['username']  = $faUser;
+            $_SESSION['user_role'] = 'fa';
+            $ok = true;
+            header('Location: ../Financial_Analyst/dashboard_analyst.php');
+            exit;
+        }
+
+        if (!$ok) {
+            $error = 'Invalid credentials for selected role.';
         }
     }
 }
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>FIS Admin – Login</title>
+  <title>FIS Login</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <style>
     body {
@@ -81,7 +104,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       box-shadow: 0 8px 20px rgba(0,0,0,0.25);
     }
     .login-body { padding: 48px 28px 26px; }
-    .form-control {
+    .form-control, .form-select {
       border-radius: 999px;
       padding-left: 16px;
       padding-right: 16px;
@@ -102,7 +125,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <body>
   <div class="login-card">
     <div class="login-header">
-      <h4 class="mb-1">FIS Admin</h4>
+      <h4 class="mb-1">FIS Login</h4>
       <p class="mb-0 text-light text-small">Secure access to Financial Institution System</p>
       <div class="login-logo">FI</div>
     </div>
@@ -122,13 +145,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           <label class="form-label text-small">Password</label>
           <input type="password" name="password" class="form-control" required>
         </div>
+        <div class="mb-3">
+          <label class="form-label text-small">Login as</label>
+          <select name="role" class="form-select" required>
+            <option value="admin">Admin</option>
+            <option value="fa">Financial Analyst</option>
+          </select>
+        </div>
         <button type="submit" class="btn btn-login w-100 text-white mb-2">
           Sign in
         </button>
       </form>
 
       <p class="text-center text-muted text-small mt-2 mb-0">
-        Log in using a staff username and password.
+        Use admin / 1234 for Admin, analyst / 5678 for Financial Analyst (demo).
       </p>
     </div>
   </div>
