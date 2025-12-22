@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auditor Portal - Create Fraud Alert</title>
+    <style>
+        :root {
+            --bg-dark: #0f172a;
+            --bg-panel: #1e293b;
+            --bg-panel-hover: #334155;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --border-color: #334155;
+            --accent-blue: #3b82f6;
+            --accent-red: #ef4444;
+            --accent-green: #22c55e;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Inter, Helvetica, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-primary);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+            font-size: 14px;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 240px;
+            background-color: var(--bg-panel);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            padding: 1rem;
+        }
+
+        .logo {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .nav-link {
+            display: block;
+            padding: 0.75rem 1rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: 4px;
+            margin-bottom: 0.25rem;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            background-color: var(--bg-panel-hover);
+            color: var(--text-primary);
+        }
+
+        .nav-link.active {
+            border-left: 3px solid var(--accent-blue);
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
+        /* Header */
+        .header {
+            background-color: var(--bg-panel);
+            border-bottom: 1px solid var(--border-color);
+            padding: 0.75rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .auditor-info {
+            display: flex;
+            gap: 2rem;
+            font-size: 0.9rem;
+        }
+
+        .info-label {
+            color: var(--text-secondary);
+            margin-right: 0.5rem;
+        }
+
+        .info-value {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .text-green {
+            color: var(--accent-green);
+        }
+
+        /* Form Container */
+        .dashboard-container {
+            padding: 1.5rem;
+            max-width: 1000px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .section-container {
+            background-color: var(--bg-panel);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .section-header {
+            padding: 1rem 1.25rem;
+            border-bottom: 1px solid var(--border-color);
+            background-color: rgba(255, 255, 255, 0.02);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .section-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        /* Form Styling */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+            padding: 1.5rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .form-group.full-width {
+            grid-column: span 2;
+        }
+
+        label {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        input,
+        select,
+        textarea {
+            background-color: var(--bg-dark);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            padding: 0.75rem;
+            color: var(--text-primary);
+            font-size: 0.9rem;
+            transition: border-color 0.2s;
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            outline: none;
+            border-color: var(--accent-blue);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        input:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        .btn-group {
+            grid-column: span 2;
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 4px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            text-align: center;
+            border: none;
+            display: inline-block;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background-color: var(--accent-blue);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #2563eb;
+        }
+
+        .btn-secondary {
+            background-color: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--text-primary);
+            color: var(--text-primary);
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="logo">FinAudit Pro</div>
+        <nav>
+            <a href="auditor_dashboard.html" class="nav-link">Dashboard</a>
+            <a href="fraud_alerts.html" class="nav-link active">Fraud Alerts</a>
+            <a href="audit_reports.html" class="nav-link">Audit Reports</a>
+        </nav>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Header -->
+        <header class="header">
+            <div class="auditor-info">
+                <div>
+                    <span class="info-label">Action:</span>
+                    <span class="info-value">New Fraud Alert</span>
+                </div>
+                <div>
+                    <a href="fraud_alerts.html" style="color: var(--text-secondary); text-decoration: none;">&larr; Back
+                        to List</a>
+                </div>
+            </div>
+        </header>
+
+        <!-- Form Container -->
+        <div class="dashboard-container">
+            <div class="section-container">
+                <div class="section-header">
+                    <div class="section-title">Log New Fraud Alert</div>
+                </div>
+                <!-- Mock Form: Create New -->
+                <form>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Alert ID</label>
+                            <input type="text" value="New (Auto-generated)" disabled>
+                        </div>
+                        <div class="form-group">
+                            <label for="transID">Transaction ID</label>
+                            <input type="text" id="transID" placeholder="e.g. 9015">
+                        </div>
+                        <div class="form-group">
+                            <label for="riskScore">Risk Score</label>
+                            <input type="number" id="riskScore" placeholder="0-100" min="0" max="100">
+                        </div>
+                        <div class="form-group">
+                            <label for="detectionDate">Detection Date</label>
+                            <input type="date" id="detectionDate">
+                        </div>
+                        <div class="form-group">
+                            <label for="status">Initial Status</label>
+                            <select id="status">
+                                <option value="Investigating" selected>Investigating</option>
+                                <option value="Critical">Critical</option>
+                                <option value="False Positive">False Positive</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="assignedTo">Assigned Auditor</label>
+                            <select id="assignedTo">
+                                <option value="103" selected>Robert Brown</option>
+                                <option value="104">Azafi Sifat</option>
+                            </select>
+                        </div>
+                        <div class="form-group full-width">
+                            <label for="notes">Incident Description</label>
+                            <textarea id="notes" placeholder="Describe the suspicious activity..."></textarea>
+                        </div>
+
+                        <div class="btn-group">
+                            <button type="submit" class="btn btn-primary">Create Alert</button>
+                            <a href="fraud_alerts.html" class="btn btn-secondary">Cancel</a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.querySelector('form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const data = {
+                transactionId: document.getElementById('transID').value,
+                riskScore: document.getElementById('riskScore').value,
+                detectionDate: document.getElementById('detectionDate').value
+            };
+
+            try {
+                const response = await fetch('api_fraud.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                const result = await response.json();
+                if (result.message) {
+                    alert('Alert Created!');
+                    window.location.href = 'fraud_alerts.html';
+                } else {
+                    alert('Error: ' + result.error);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auditor Portal - Audit Reports</title>
+    <style>
+        :root {
+            --bg-dark: #0f172a;
+            --bg-panel: #1e293b;
+            --bg-panel-hover: #334155;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --border-color: #334155;
+            --accent-blue: #3b82f6;
+            --accent-red: #ef4444;
+            --accent-green: #22c55e;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Inter, Helvetica, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-primary);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+            font-size: 14px;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 240px;
+            background-color: var(--bg-panel);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            padding: 1rem;
+        }
+
+        .logo {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .nav-link {
+            display: block;
+            padding: 0.75rem 1rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: 4px;
+            margin-bottom: 0.25rem;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            background-color: var(--bg-panel-hover);
+            color: var(--text-primary);
+        }
+
+        .nav-link.active {
+            border-left: 3px solid var(--accent-blue);
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
+        /* Header */
+        .header {
+            background-color: var(--bg-panel);
+            border-bottom: 1px solid var(--border-color);
+            padding: 0.75rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .auditor-info {
+            display: flex;
+            gap: 2rem;
+            font-size: 0.9rem;
+        }
+
+        .info-label {
+            color: var(--text-secondary);
+            margin-right: 0.5rem;
+        }
+
+        .info-value {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .text-green {
+            color: var(--accent-green);
+        }
+
+        /* Dashboard Grid */
+        .dashboard-container {
+            padding: 1.5rem;
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 1.5rem;
+            max-width: 1600px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        /* Tables & Forms Containers */
+        .section-container {
+            grid-column: span 12;
+            background-color: var(--bg-panel);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .section-header {
+            padding: 1rem 1.25rem;
+            border-bottom: 1px solid var(--border-color);
+            background-color: rgba(255, 255, 255, 0.02);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .section-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .btn-new {
+            background-color: var(--accent-blue);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: background-color 0.2s;
+        }
+
+        .btn-new:hover {
+            background-color: #2563eb;
+        }
+
+        /* Tables */
+        .table-responsive {
+            overflow-x: auto;
+            width: 100%;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+
+        th {
+            background-color: var(--bg-dark);
+            color: var(--text-secondary);
+            font-weight: 600;
+            text-align: left;
+            padding: 0.75rem 1.25rem;
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            white-space: nowrap;
+        }
+
+        td {
+            padding: 0.75rem 1.25rem;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-primary);
+            max-width: 300px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        tr:nth-child(even) {
+            background-color: rgba(255, 255, 255, 0.02);
+        }
+
+        tr:hover {
+            background-color: var(--bg-panel-hover);
+        }
+
+        .btn-action {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            padding: 0.25rem 0.75rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            margin-right: 0.5rem;
+            transition: all 0.2s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-action:hover {
+            border-color: var(--text-primary);
+            color: var(--text-primary);
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+
+        .btn-action.text-red {
+            color: var(--accent-red);
+        }
+
+        .btn-action.text-red:hover {
+            border-color: var(--accent-red);
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="logo">FinAudit Pro</div>
+        <nav>
+            <a href="auditor_dashboard.html" class="nav-link">Dashboard</a>
+            <a href="fraud_alerts.html" class="nav-link">Fraud Alerts</a>
+            <a href="audit_reports.html" class="nav-link active">Audit Reports</a>
+        </nav>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Header -->
+        <header class="header">
+            <div class="auditor-info">
+                <div>
+                    <span class="info-label">Current Auditor:</span>
+                    <span class="info-value">Robert Brown (Staff ID: 103)</span>
+                </div>
+                <div>
+                    <span class="info-label">Last Review Date:</span>
+                    <span class="info-value">2025-12-08</span>
+                </div>
+            </div>
+            <div class="auditor-info">
+                <div>
+                    <span class="info-label">System Status:</span>
+                    <span class="info-value text-green">Online</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Dashboard Grid -->
+        <div class="dashboard-container">
+
+            <div class="section-container">
+                <div class="section-header">
+                    <div class="section-title">Submitted Audit Reports</div>
+                    <a href="create_audit_report.html" class="btn-new">+ New Report</a>
+                </div>
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Report ID</th>
+                                <th>Staff ID</th>
+                                <th>Date</th>
+                                <th>Findings Summary</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Mock Data Row 1 -->
+                            <tr>
+                                <td>1</td>
+                                <td>103 (Robert Brown)</td>
+                                <td>2025-12-19</td>
+                                <td>Verified tech sector transactions; found one high-risk alert for review.</td>
+                                <td style="white-space: nowrap;">
+                                    <a href="edit_audit_report.html" class="btn-action">Edit</a>
+                                    <button class="btn-action text-red">Delete</button>
+                                </td>
+                            </tr>
+                            <!-- Mock Data Row 2 -->
+                            <tr>
+                                <td>2</td>
+                                <td>103 (Robert Brown)</td>
+                                <td>2025-12-19</td>
+                                <td>Quarterly compliance check completed. No major anomalies pending action.</td>
+                                <td style="white-space: nowrap;">
+                                    <a href="edit_audit_report.html" class="btn-action">Edit</a>
+                                    <button class="btn-action text-red">Delete</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+        </div>
+
+        <script>
+            const API_URL = 'api_audit.php';
+
+            async function fetchReports() {
+                try {
+                    const response = await fetch(API_URL);
+                    const reports = await response.json();
+                    const tbody = document.querySelector('tbody');
+                    tbody.innerHTML = '';
+
+                    reports.forEach(report => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                        <td>${report.ReportID}</td>
+                        <td>${report.StaffID || 'N/A'}</td>
+                        <td>${report.Date}</td>
+                        <td>${report.FindingsSummary}</td>
+                        <td style="white-space: nowrap;">
+                            <a href="edit_audit_report.html?id=${report.ReportID}" class="btn-action">Edit</a>
+                            <button onclick="deleteReport(${report.ReportID})" class="btn-action text-red">Delete</button>
+                        </td>
+                    `;
+                        tbody.appendChild(row);
+                    });
+                } catch (error) {
+                    console.error('Error fetching reports:', error);
+                }
+            }
+
+            async function deleteReport(id) {
+                if (!confirm('Delete this report?')) return;
+
+                try {
+                    const response = await fetch(`${API_URL}?id=${id}`, { method: 'DELETE' });
+                    const result = await response.json();
+                    if (result.message) fetchReports();
+                    else alert('Error deleting');
+                } catch (e) {
+                    console.error(e);
+                }
+            }
+
+            document.addEventListener('DOMContentLoaded', fetchReports);
+        </script>
+</body>
+
+</html>
